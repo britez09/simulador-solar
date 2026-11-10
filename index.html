@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simule seu sistema solar GRÁTIS</title>
+    <style>
+        /* ----------------------------------------------------------------------- */
+        /* CSS GERAL: Formulário e Layout Base */
+        /* ----------------------------------------------------------------------- */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: #fcfcfc;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 650px;
+            width: 100%;
+            margin-top: 50px;
+            margin-bottom: 50px;
+        }
+
+        h2 {
+            color: #27ae60;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .subtext {
+            text-align: center;
+            color: #333;
+            font-size: 14px;
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: normal;
+            color: #333;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="email"],
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 15px;
+            color: #333;
+        }
+        
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="email"]:focus,
+        select:focus {
+            border-color: #27ae60;
+            outline: none;
+            box-shadow: 0 0 3px rgba(39, 174, 96, 0.4);
+        }
+
+        .row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .row > .form-group {
+            flex: 1;
+        }
+
+        .acordo-lgpd {
+            margin-top: 25px;
+            margin-bottom: 25px;
+            font-size: 12px;
+            color: #e74c3c;
+            line-height: 1.4;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .acordo-lgpd input[type="checkbox"] {
+            margin-top: 2px;
+            margin-right: 8px;
+            width: auto;
+            min-width: 15px;
+            height: 15px;
+        }
+
+        .acordo-lgpd a {
+            color: #3498db;
+            text-decoration: underline;
+        }
+        
+        /* Botão Simular */
+        .btn-simular {
+            background-color: #27ae60;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s, opacity 0.3s;
+            width: 100%;
+        }
+
+        .btn-simular:hover:not(:disabled) {
+            background-color: #219653;
+        }
+
+        .btn-simular:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* ----------------------------------------------------------------------- */
+        /* CSS: RESULTADOS */
+        /* ----------------------------------------------------------------------- */
+
+        #resultados-container {
+            display: none; /* ESCONDIDO POR PADRÃO */
+            margin-top: 20px; 
+            padding: 0;
+        }
+
+        h3.titulo-resultados {
+            color: #27ae60;
+            font-size: 18px;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 0;
+            margin-bottom: 25px;
+        }
+
+        /* Boxes de Resultados */
+        .row.mini-boxes {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .resultado-box {
+            background: #ffffff;
+            padding: 15px 10px;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            border: 1px solid #eee;
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .resultado-box h4 {
+            margin: 0;
+            color: #777;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+
+        .resultado-box p {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            margin: 5px 0 0 0;
+        }
+
+        .resultado-box.economia p {
+            color: #32cd32; 
+            font-size: 1.4em;
+        }
+
+        /* Secções de Destaque */
+        .secao-destaque {
+            background-color: #f0f7fb; 
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 25px;
+            text-align: center;
+        }
+        
+        .secao-destaque h4 {
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            color: #333;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        /* Valor Estimado do Investimento */
+        #investimento-faixa {
+            font-size: 1.8em;
+            font-weight: 900;
+            color: #3498db;
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        .investimento-subtexto {
+            font-size: 0.8em;
+            color: #777;
+        }
+
+        /* Comparativo */
+        .comparativo {
+            margin-top: 25px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        .comparativo h4 {
+            text-align: center;
+            margin-top: 0;
+        }
+
+        .comparativo .comparativo-grid {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .comparativo .col-valor {
+            flex: 1;
+            text-align: center;
+        }
+
+        .comparativo .col-valor p {
+            font-size: 0.8em;
+            font-weight: 500;
+            color: #777;
+            margin-bottom: 5px;
+        }
+
+        .comparativo .valor-destaque {
+            font-size: 1.4em;
+            font-weight: 900;
+            margin-top: 0;
+            padding: 5px 10px;
+            border-radius: 4px;
+            display: block;
+        }
+
+        .comparativo .parcela-valor {
+            color: #0808e7;
+            background-color: #d2e6fe;
+        }
+
+        .comparativo .fatura-valor {
+            color: #e74c3c;
+            background-color: #fde8e8;
+        }
+
+        .comparativo .vs {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #27ae60;
+            padding: 0 10px;
+        }
+        
+        .comparativo small {
+            display: block;
+            font-size: 0.7em;
+            color: #777;
+            margin-top: 15px;
+        }
+
+        .acoes-rodape {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Simule seu sistema solar GRÁTIS</h2>
+        <p class="subtext">Descubra o tamanho ideal do seu sistema solar e quanto você vai economizar na sua conta de luz.</p>
+
+        <form id="solarForm" onsubmit="calcularSistema(event)">
+            <div class="row">
+                <div class="form-group">
+                    <label for="nome">Nome Completo</label>
+                    <input type="text" id="nome" required placeholder="Digite seu nome">
+                </div>
+                <div class="form-group">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" required placeholder="seu@email.com">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group">
+                    <label for="valorFatura">Valor Médio da Fatura (R$)</label>
+                    <input type="number" id="valorFatura" required min="50" placeholder="Ex: 350">
+                </div>
+                <div class="form-group">
+                    <label for="concessionaria">Concessionária</label>
+                    <select id="concessionaria" required>
+                        <option value="0.95">Enel</option>
+                        <option value="0.90">CPFL</option>
+                        <option value="1.00">Cemig</option>
+                        <option value="0.85">Light</option>
+                        <option value="0.92">Outra</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="acordo-lgpd">
+                <input type="checkbox" id="lgpd" required>
+                <label for="lgpd">Estou de acordo com os termos da <a href="#">Política de Privacidade</a> e autorizo o contato comercial.</label>
+            </div>
+
+            <button type="submit" class="btn-simular">SIMULAR AGORA</button>
+        </form>
+
+        <!-- ------------------------------------------------------------------- -->
+        /* BLOCO DE RESULTADOS DINÂMICOS */
+        <!-- ------------------------------------------------------------------- -->
+        <div id="resultados-container">
+            <h3 class="titulo-resultados">📊 Resultado da sua Simulação</h3>
+            
+            <div class="row mini-boxes">
+                <div class="resultado-box">
+                    <h4>Potência do Sistema</h4>
+                    <p id="resPotencia">0.00 kWp</p>
+                </div>
+                <div class="resultado-box">
+                    <h4>Qtd. Módulos (Placas)</h4>
