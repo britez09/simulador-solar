@@ -59,7 +59,6 @@
         }
 
         input[type="text"],
-        input[type="number"],
         input[type="email"],
         select {
             width: 100%;
@@ -69,10 +68,29 @@
             box-sizing: border-box;
             font-size: 15px;
             color: #333;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        #consumo {
+            background-color: #f7f7f7;
+            color: #777;
+            cursor: not-allowed;
+        }
+        
+        #cidade, #estado {
+            background-color: #e9ecef;
+            color: #555;
+            cursor: default;
+        }
+        
+        #concessionaria {
+            background-color: #fff;
+            color: #555;
         }
         
         input[type="text"]:focus,
-        input[type="number"]:focus,
         input[type="email"]:focus,
         select:focus {
             border-color: #27ae60;
@@ -114,7 +132,7 @@
         
         /* Botão Simular */
         .btn-simular {
-            background-color: #27ae60;
+            background-color: #82b992;
             color: white;
             padding: 12px 20px;
             border: none;
@@ -127,7 +145,7 @@
         }
 
         .btn-simular:hover:not(:disabled) {
-            background-color: #219653;
+            background-color: #27ae60;
         }
 
         .btn-simular:disabled {
@@ -142,7 +160,7 @@
 
         #resultados-container {
             display: none; /* ESCONDIDO POR PADRÃO */
-            margin-top: 20px; 
+            margin-top: -30px; 
             padding: 0;
         }
 
@@ -153,15 +171,10 @@
             font-weight: bold;
             margin-top: 0;
             margin-bottom: 25px;
+            border-bottom: none;
         }
 
-        /* Boxes de Resultados */
-        .row.mini-boxes {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
+        /* Boxes de Resultados (Potência, Placas, Geração, Economia) */
         .resultado-box {
             background: #ffffff;
             padding: 15px 10px;
@@ -169,13 +182,17 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             text-align: center;
             border: 1px solid #eee;
+            height: 85px; 
+        }
+        
+        .row.mini-boxes > .resultado-box {
             flex: 1;
             min-width: 0;
         }
         
         .resultado-box h4 {
             margin: 0;
-            color: #777;
+            color: #333;
             font-size: 0.8em;
             font-weight: 500;
         }
@@ -192,7 +209,7 @@
             font-size: 1.4em;
         }
 
-        /* Secções de Destaque */
+        /* Secções de Destaque (Valor Estimado, Parcelas) */
         .secao-destaque {
             background-color: #f0f7fb; 
             padding: 20px;
@@ -213,7 +230,7 @@
         #investimento-faixa {
             font-size: 1.8em;
             font-weight: 900;
-            color: #3498db;
+            color: #3498db; /* A cor foi alterada para azul */
             display: block;
             margin-bottom: 10px;
         }
@@ -221,6 +238,20 @@
         .investimento-subtexto {
             font-size: 0.8em;
             color: #777;
+        }
+        
+        /* Box de Parcelas Escolhidas */
+        .parcela-escolhida-box {
+            text-align: center;
+            margin-top: 15px;
+        }
+        
+        .parcela-escolhida-box .valor-parcela {
+            font-size: 2.2em;
+            font-weight: 900;
+            color: #27ae60;
+            display: block;
+            margin-top: 10px;
         }
 
         /* Comparativo */
@@ -234,7 +265,6 @@
 
         .comparativo h4 {
             text-align: center;
-            margin-top: 0;
         }
 
         .comparativo .comparativo-grid {
@@ -289,65 +319,712 @@
             margin-top: 15px;
         }
 
+        /* Rodapé e Botões */
         .acoes-rodape {
-            margin-top: 20px;
-            text-align: center;
+            margin-top: 30px;
         }
+        
+        .btn-refazer {
+            background-color: #95a5a6;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+        /* Adicionado para garantir o espaçamento entre os botões no rodapé se ambos estiverem visíveis*/
+        .acoes-rodape .btn-simular + .btn-refazer {
+            margin-top: 15px;
+        }
+
     </style>
 </head>
 <body>
-
     <div class="container">
-        <h2>Simule seu sistema solar GRÁTIS</h2>
-        <p class="subtext">Descubra o tamanho ideal do seu sistema solar e quanto você vai economizar na sua conta de luz.</p>
+        <h2>⚡ Simule seu sistema solar GRÁTIS ⚡</h2>
+        <p class="subtext">
+            Preencha os dados abaixo, descubra quanto você está deixando de ganhar, por não ter Energia Solar!<br>
+            Valor que você poderia usar em algo que te dá mais qualidade de vida.
+        </p>
 
-        <form id="solarForm" onsubmit="calcularSistema(event)">
+        <form id="solar-form">
             <div class="row">
                 <div class="form-group">
-                    <label for="nome">Nome Completo</label>
-                    <input type="text" id="nome" required placeholder="Digite seu nome">
+                    <label for="nome">Nome completo *</label>
+                    <input type="text" id="nome" required>
                 </div>
                 <div class="form-group">
-                    <label for="email">E-mail</label>
-                    <input type="email" id="email" required placeholder="seu@email.com">
+                    <label for="email">E-mail *</label>
+                    <input type="email" id="email" required>
                 </div>
             </div>
 
             <div class="row">
                 <div class="form-group">
-                    <label for="valorFatura">Valor Médio da Fatura (R$)</label>
-                    <input type="number" id="valorFatura" required min="50" placeholder="Ex: 350">
+                    <label for="whatsapp">WhatsApp *</label>
+                    <input type="text" id="whatsapp" required maxlength="15" placeholder="(99) 99999-9999">
                 </div>
                 <div class="form-group">
-                    <label for="concessionaria">Concessionária</label>
-                    <select id="concessionaria" required>
-                        <option value="0.95">Enel</option>
-                        <option value="0.90">CPFL</option>
-                        <option value="1.00">Cemig</option>
-                        <option value="0.85">Light</option>
-                        <option value="0.92">Outra</option>
+                    <label for="cep">Endereço / CEP *</label>
+                    <input type="text" id="cep" required maxlength="9" placeholder="99999-999">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group">
+                    <label for="cidade">Cidade *</label>
+                    <input type="text" id="cidade" required readonly placeholder="Preenchido automaticamente pelo CEP">
+                </div>
+                <div class="form-group">
+                    <label for="estado">Estado *</label>
+                    <input type="text" id="estado" required readonly maxlength="2" placeholder="Preenchido automaticamente pelo CEP">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group">
+                    <label for="fatura">Valor médio da fatura (R$) *</label>
+                    <input type="text" id="fatura" required placeholder="Ex: R$ 500,00">
+                </div>
+                <div class="form-group">
+                    <label for="consumo">Consumo médio mensal (kWh) *</label>
+                    <input type="text" id="consumo" readonly placeholder="Calculado: Fatura / Tarifa">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group">
+                    <label for="padrao">Padrão *</label>
+                    <select id="padrao" required>
+                        <option value="" selected disabled>Selecione</option>
+                        <option value="Monofásico">Monofásico</option>
+                        <option value="Bifásico">Bifásico</option>
+                        <option value="Trifásico">Trifásico</option>
                     </select>
                 </div>
+                <div class="form-group">
+                    <label for="imovel">Tipo de imóvel *</label>
+                    <select id="imovel" required>
+                        <option value="" selected disabled>Selecione</option>
+                        <option value="Residencial">Residencial</option>
+                        <option value="Comercial">Comercial</option>
+                        <option value="Industrial">Industrial</option>
+                        <option value="Rural">Rural</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="concessionaria">Concessionária de energia *</label>
+                    <input type="text" id="concessionaria" required placeholder="A calcular pela cidade">
+                </div>
             </div>
-
+            
             <div class="acordo-lgpd">
                 <input type="checkbox" id="lgpd" required>
-                <label for="lgpd">Estou de acordo com os termos da <a href="#">Política de Privacidade</a> e autorizo o contato comercial.</label>
+                <div>
+                    <strong>**Concordo**.</strong> Ao enviar este formulário, você concorda com o tratamento dos seus dados pessoais para fins de **contato e simulação de projeto solar**. Para mais informações sobre como tratamos seus dados e seus direitos, acesse nossa <a href="#" target="_blank">Política de Privacidade</a>.
+                </div>
             </div>
 
-            <button type="submit" class="btn-simular">SIMULAR AGORA</button>
+            <input type="hidden" id="simulacao-id" name="simulacao-id" value="">
+
+            <input type="hidden" id="status-contato" name="Status de Contato" value="Aberto">
+
+            <button type="submit" id="btn-simular" class="btn-simular" disabled>Simular agora</button>
         </form>
 
-        <!-- ------------------------------------------------------------------- -->
-        /* BLOCO DE RESULTADOS DINÂMICOS */
-        <!-- ------------------------------------------------------------------- -->
         <div id="resultados-container">
-            <h3 class="titulo-resultados">📊 Resultado da sua Simulação</h3>
-            
+<br>
+            <h3 class="titulo-resultados">Seus Resultados de Economia e Investimento ✨</h3>
+
             <div class="row mini-boxes">
                 <div class="resultado-box">
-                    <h4>Potência do Sistema</h4>
-                    <p id="resPotencia">0.00 kWp</p>
+                    <h4>Potência Estimada</h4>
+<br>
+                    <p id="potencia-kwp">0.00 kWp</p>
                 </div>
                 <div class="resultado-box">
-                    <h4>Qtd. Módulos (Placas)</h4>
+                    <h4>Quantidade de Placas Aproximado</h4>
+                    <p id="placas-qtd">0</p>
+                </div>
+                <div class="resultado-box">
+                    <h4>Geração Média Mensal</h4>
+                    <p id="geracao-anual">0 kWh</p>
+                </div>
+                <div class="resultado-box economia">
+                    <h4>Média de Economia Mensal 💰</h4>
+                    <p id="economia-anual">R$ 0,00</p>
+                </div>
+            </div>
+
+            <div class="secao-destaque">
+                <h4>Faixa de Valor Estimado do Investimento </h4>
+                <p id="investimento-faixa">R$ 0,00 a R$ 0,00</p>
+                <p class="investimento-subtexto">
+                    Faixa de valor do projeto (entre mínima e máxima dependerá do tipo de instalação: Se será tipo no telhado ou no solo etc, para uma simulação assertiva nos chame no WhatsApp.)
+                </p>
+                <input type="hidden" id="investimento-total-display" value="0"> 
+            </div>
+
+            <div class="secao-destaque">
+                <h4>Parcelas e Condições com Parceiros</h4>
+                <p style="font-size: 0.9em; color: #777;">Parceiros: **Sicredi, BV, Solfácil, Sol Agora**</p>
+                
+                <div class="parcela-escolhida-box">
+                    <p style="font-size: 0.9em; color: #333; margin-bottom: 5px;">Valor estimado da parcela escolhida:</p>
+                    <span class="valor-parcela" id="parcela-escolhida">Selecione o Prazo</span>
+                    <small id="prazo-escolhido" style="display: block; font-size: 0.9em; color: #27ae60; font-weight: bold; margin-top: 5px;"></small>
+                </div>
+            </div>
+            
+            <div class="secao-destaque" style="background-color: transparent; border: none; text-align: left;">
+                <h4>Escolha o valor de parcela mais adequada a você</h4>
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <select id="select-parcelamento">
+                        <option value="" data-valor="0" data-economia="0" data-prazo="0" selected disabled>— Selecione o Prazo de Parcelamento —</option>
+                    </select>
+                </div>
+                <small style="display: block; font-size: 0.75em; color: #777;">*A taxa de juros (2,80% a.m.) é uma estimativa e pode variar por parceiro e análise de crédito, solicite um valor real pelo WhatsApp.</small>
+            </div>
+
+            <div class="comparativo">
+                <h4>Comparativo: Valor da Parcela Selecionada versus Valor médio da fatura mensal</h4>
+                <div class="comparativo-grid">
+                    <div class="col-valor">
+                        <p id="comparativo-parcela-label">PARCELA ESTIMADA (Selecione)</p>
+                        <span class="valor-destaque parcela-valor" id="comparativo-parcela">R$ 0,00</span>
+                    </div>
+<br>
+                    <div class="vs">VS</div>
+                    <div class="col-valor">
+                        <p>FATURA MÉDIA MENSAL</p>
+                        <span class="valor-destaque fatura-valor" id="comparativo-fatura">R$ 0,00</span>
+                    </div>
+                </div>
+                <small>*Os valores de parcela são apenas estimativas financeiras e não uma proposta formal de crédito. Para Proposta real do projeto entre em contato pelo WhatsApp.</small>
+            </div>
+
+            <div class="acoes-rodape">
+                <button type="button" id="btn-falar-especialista" class="btn-simular" style="background-color: #27ae60; margin-bottom: 15px;">
+                    FALAR COM UM ESPECIALISTA
+                </button>
+                <button type="button" id="btn-refazer" class="btn-refazer">Refazer simulação</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // -----------------------------------------------------------------------
+        // UTIL: cria um ID curto para agrupar submissões da mesma sessão
+        // -----------------------------------------------------------------------
+        function generateShortId(len = 8) {
+            const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+            let s = '';
+            for (let i = 0; i < len; i++) s += chars[Math.floor(Math.random() * chars.length)];
+            return s;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // -----------------------------------------------------------------------
+            // 1. VARIÁVEIS DE CONFIGURAÇÃO
+            // -----------------------------------------------------------------------
+            const CONFIG = {
+                // !!! VERIFIQUE SE ESTE LINK ESTÁ CORRETO NO SEU GOOGLE FORMS !!!
+                GOOGLE_FORM_ACTION_URL: 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSek3cL9uY3_E4fhnPYP1CN1znHDWAw9ddVg-5AY0gQTwOHHgg/formResponse',
+                // Fatores de Cálculo Solar
+                IRRADIACAO_MEDIA: 4.70,
+                EFICIENCIA_SISTEMA: 0.80,
+                MODULO_Wp: 560,
+                ECONOMIA_PERCENTUAL: 0.91,
+                // Fatores de Custo e Investimento
+                TARIFA_ENERGIA_PADRAO: 1.09,
+                CUSTO_Wp_MIN: 2.30,
+                CUSTO_Wp_MAX: 3.0,
+                // Fatores de Financiamento
+                TAXA_JUROS_MENSAL: 0.0280,
+                PRAZO_PADRAO_MESES: 120,
+                PRAZOS_OPCOES: [24, 36, 48, 60, 72, 84, 96, 108, 120],
+                CONCESSIONARIAS: {
+                    'AC': 'Energisa Acre', 'AL': 'Equatorial Alagoas', 'AM': 'Amazonas Energia',
+                    'AP': 'CEA Equatorial', 'BA': 'Neoenergia Coelba', 'CE': 'Enel Ceará',
+                    'DF': 'Neoenergia Brasília', 'ES': 'EDP Espírito Santo', 'GO': 'Enel Goiás',
+                    'MA': 'Equatorial Maranhão', 'MG': 'Cemig', 'MS': 'Energisa Mato Grosso do Sul',
+                    'MT': 'Energisa Mato Grosso', 'PA': 'Equatorial Pará', 'PB': 'Energisa Paraíba',
+                    'PE': 'Neoenergia Pernambuco', 'PI': 'Equatorial Piauí', 'PR': 'Copel',
+                    'RJ': 'Light / Enel Rio', 'RN': 'Neoenergia Cosern', 'RO': 'Energisa Rondônia',
+                    'RR': 'Roraima Energia', 'RS': 'RGE / CEEE Equatorial', 'SC': 'Celesc',
+                    'SE': 'Energisa Sergipe', 'SP': 'Enel SP / CPFL', 'TO': 'Energisa Tocantins'
+                }
+            };
+
+            // -----------------------------------------------------------------------
+            // 2. MAPEAMENTO DE CAMPOS (GOOGLE FORMS ENTRY IDs)
+            // -----------------------------------------------------------------------
+            const FORM_FIELD_MAP = {
+                NomeCompleto: 'entry.1988272677',
+                Email: 'entry.234998618',
+                WhatsApp: 'entry.614645631',
+                CEP: 'entry.1156919339',
+                Cidade: 'entry.1837303929',
+                Estado: 'entry.169130615',
+                ValorFatura: 'entry.1319870160',
+                ConsumoKWh: 'entry.766478788',
+                PadraoEletrico: 'entry.441173471',
+                TipoImovel: 'entry.2079050980',
+                Concessionaria: 'entry.261968230',
+                PotenciaEstimada: 'entry.945474182',
+                PlacasQtd: 'entry.1618904651',
+                GeracaoMensal: 'entry.1965207438',
+                EconomiaMensal: 'entry.642466562',
+                InvestimentoFaixa: 'entry.922181841',
+                ParcelaEscolhida: 'entry.458344876', 
+                PrazoParcelamento: 'entry.1443080052', 
+                SimulacaoID: 'entry.2091219614', 
+                StatusContato: 'entry.1898671251'
+            };
+
+            // -----------------------------------------------------------------------
+            // 3. Referências DOM e variáveis
+            // -----------------------------------------------------------------------
+            const form = document.getElementById('solar-form');
+            const btnSimular = document.getElementById('btn-simular');
+            const btnRefazer = document.getElementById('btn-refazer');
+            const btnFalarEspecialista = document.getElementById('btn-falar-especialista'); 
+            const resultadosContainer = document.getElementById('resultados-container');
+
+            const inputNome = document.getElementById('nome');
+            const inputEmail = document.getElementById('email');
+            const inputFatura = document.getElementById('fatura');
+            const inputConsumo = document.getElementById('consumo');
+            const inputCep = document.getElementById('cep');
+            const inputWhatsapp = document.getElementById('whatsapp');
+            const inputCidade = document.getElementById('cidade');
+            const inputEstado = document.getElementById('estado');
+            const inputConcessionaria = document.getElementById('concessionaria');
+            const inputPadrao = document.getElementById('padrao');
+            const inputImovel = document.getElementById('imovel');
+            const inputSimulacaoId = document.getElementById('simulacao-id');
+            const inputLgpd = document.getElementById('lgpd');
+            const inputStatusContato = document.getElementById('status-contato'); 
+
+            const selectParcelamento = document.getElementById('select-parcelamento');
+            const investimentoTotalDisplay = document.getElementById('investimento-total-display');
+
+
+            // Display elements
+            const potenciaKwpDisplay = document.getElementById('potencia-kwp');
+            const placasQtdDisplay = document.getElementById('placas-qtd');
+            const geracaoAnualDisplay = document.getElementById('geracao-anual');
+            const economiaAnualDisplay = document.getElementById('economia-anual');
+            const investimentoFaixaDisplay = document.getElementById('investimento-faixa');
+            const parcelaEscolhidaDisplay = document.getElementById('parcela-escolhida');
+            const prazoEscolhidoDisplay = document.getElementById('prazo-escolhido');
+            const comparativoParcelaDisplay = document.getElementById('comparativo-parcela');
+            const comparativoParcelaLabel = document.getElementById('comparativo-parcela-label');
+            const comparativoFaturaDisplay = document.getElementById('comparativo-fatura');
+
+            // Campos obrigatórios
+            const requiredFields = [
+                inputNome, inputEmail, inputFatura, inputWhatsapp, inputCep, 
+                inputCidade, inputEstado, inputPadrao, inputImovel,
+                inputConcessionaria
+            ];
+
+            let investimentoTotalBase = 0;
+            let economiaMensalCalculada = 0;
+            let dadosSimulacao = {}; // Objeto para armazenar os dados da simulação
+
+            // -----------------------------------------------------------------------
+            // 4. Funções utilitárias e de Cálculo
+            // -----------------------------------------------------------------------
+            const formatNumber = (value, decimalPlaces = 2) => {
+                if (isNaN(value)) return '0,00';
+                return value.toLocaleString('pt-BR', { minimumFractionDigits: decimalPlaces, maximumFractionDigits: decimalPlaces });
+            };
+
+            const formatCurrency = (value) => {
+                if (isNaN(value)) return 'R$ 0,00';
+                return `R$ ${formatNumber(value)}`;
+            }
+
+            const getNumericValue = (inputElement) => {
+                const cleanString = (inputElement.value || '').replace('R$', '').replace(/\./g, '').replace(',', '.').trim();
+                return parseFloat(cleanString) || 0;
+            };
+            
+            const calcularPMT = (pv, i, n) => {
+                if (i === 0) return pv / n;
+                return (pv * i * Math.pow((1 + i), n)) / (Math.pow((1 + i), n) - 1);
+            };
+
+            const calculateAndDisplay = (onlyUpdateConsumo = false) => {
+                const faturaValor = getNumericValue(inputFatura);
+                
+                if (faturaValor > 50) { 
+                    const consumoKWh = faturaValor / CONFIG.TARIFA_ENERGIA_PADRAO;
+                    inputConsumo.value = formatNumber(consumoKWh, 0);
+
+                    // Se for apenas para atualizar o consumo (enquanto digita), a função retorna aqui.
+                    if (onlyUpdateConsumo) {
+                        return true; 
+                    }
+
+                    const results = calculateSolarResults(consumoKWh, faturaValor);
+                    updateResultsDisplay(results, faturaValor);
+                    
+                    dadosSimulacao = results;
+                    return true;
+                } else {
+                    inputConsumo.value = '';
+                    // Limpar resultados se a fatura for muito baixa ou vazia
+                    return false;
+                }
+            };
+
+            const calculateSolarResults = (consumoKWh, faturaValor) => {
+                const { IRRADIACAO_MEDIA, EFICIENCIA_SISTEMA, MODULO_Wp, CUSTO_Wp_MIN, CUSTO_Wp_MAX, ECONOMIA_PERCENTUAL } = CONFIG;
+
+                // ⚡ CORREÇÃO APLICADA AQUI: Fator de Geração Mensal (HSPE x Dias x Eficiência)
+                const fatorGeracaoMensal = IRRADIACAO_MEDIA * 30.4 * EFICIENCIA_SISTEMA;
+                const denominador = Math.max(1, fatorGeracaoMensal);
+                
+                // 1. Cálculo da Potência (kWp) - CORRIGIDO
+                const potenciaKwp = consumoKWh / denominador;
+
+                // 2. Cálculo da Quantidade de Placas
+                const potenciaWp = potenciaKwp * 1000;
+                const placasQtd = Math.ceil(potenciaWp / MODULO_Wp);
+                
+                // 3. Demais Cálculos
+                const geracaoMensal = potenciaKwp * fatorGeracaoMensal; 
+                economiaMensalCalculada = faturaValor * ECONOMIA_PERCENTUAL;
+                const investimentoMin = Math.round(potenciaWp * CUSTO_Wp_MIN);
+                const investimentoMax = Math.round(potenciaWp * CUSTO_Wp_MAX);
+                investimentoTotalBase = investimentoMin; 
+
+                return {
+                    potenciaKwp: potenciaKwp,
+                    placasQtd: placasQtd,
+                    geracaoMensal: geracaoMensal,
+                    economiaMensal: economiaMensalCalculada,
+                    investimentoFaixa: `${formatCurrency(investimentoMin)} a ${formatCurrency(investimentoMax)}`,
+                    investimentoMin: investimentoMin,
+                    investimentoMax: investimentoMax
+                };
+            };
+
+            const updateResultsDisplay = (results, faturaValor) => {
+                potenciaKwpDisplay.textContent = `${formatNumber(results.potenciaKwp, 2)} kWp`;
+                placasQtdDisplay.textContent = `${results.placasQtd}`;
+                // Aqui usamos o valor real de geração que será próximo ao consumo
+                geracaoAnualDisplay.textContent = `${formatNumber(results.geracaoMensal, 0)} kWh`;
+                economiaAnualDisplay.textContent = formatCurrency(results.economiaMensal);
+                investimentoFaixaDisplay.textContent = results.investimentoFaixa;
+                comparativoFaturaDisplay.textContent = formatCurrency(faturaValor);
+                investimentoTotalDisplay.value = results.investimentoMin;
+
+                selectParcelamento.innerHTML = '<option value="" data-valor="0" data-economia="0" data-prazo="0" selected disabled>— Selecione o Prazo de Parcelamento —</option>';
+                
+                CONFIG.PRAZOS_OPCOES.forEach(prazo => {
+                    const parcela = calcularPMT(results.investimentoMin, CONFIG.TAXA_JUROS_MENSAL, prazo);
+                    const diferenca = parcela - results.economiaMensal;
+                    
+                    const option = document.createElement('option');
+                    option.value = `${prazo} meses`;
+                    
+                    // CORREÇÃO VISUAL: Ocultando a informação de custo do dropdown
+                    option.textContent = `${prazo}x de ${formatCurrency(parcela)}`;
+                    
+                    option.dataset.valor = parcela.toFixed(2);
+                    option.dataset.prazo = prazo;
+                    
+                    selectParcelamento.appendChild(option);
+                });
+            };
+
+            // Máscaras e Utilitários
+            const formatFaturaInput = () => {
+                let valor = (inputFatura.value || '').replace(/[^\d,]/g, '');
+                const partes = valor.split(',');
+                if (partes.length > 1) {
+                    valor = partes[0].replace(/\./g, '') + ',' + partes[1].substring(0, 2);
+                } else {
+                    valor = partes[0].replace(/\./g, '');
+                }
+                const [inteiro = '0', decimal] = valor.split(',');
+                const inteiroFormatado = inteiro.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                inputFatura.value = `R$ ${inteiroFormatado}${decimal ? ',' + decimal : ''}`;
+            };
+            
+            const formatWhatsappInput = () => {
+                let valor = (inputWhatsapp.value || '').replace(/\D/g, '');
+                if (valor.length > 0) valor = '(' + valor;
+                if (valor.length > 3) valor = valor.substring(0, 3) + ') ' + valor.substring(3);
+                if (valor.length > 10) valor = valor.substring(0, 10) + '-' + valor.substring(10, 15);
+                inputWhatsapp.value = valor;
+            };
+            
+            const formatCepInput = () => {
+                let valor = (inputCep.value || '').replace(/\D/g, '');
+                if (valor.length > 5) valor = valor.substring(0, 5) + '-' + valor.substring(5, 8);
+                inputCep.value = valor;
+            };
+
+            const updateConcessionaria = (estadoSigla) => {
+                const estado = estadoSigla.toUpperCase();
+                if (CONFIG.CONCESSIONARIAS[estado]) {
+                    inputConcessionaria.value = CONFIG.CONCESSIONARIAS[estado];
+                    inputConcessionaria.placeholder = 'Preenchido automaticamente';
+                } else {
+                    inputConcessionaria.value = '';
+                    inputConcessionaria.placeholder = 'A calcular pela cidade';
+                }
+                checkFormValidity();
+            };
+
+            // LÓGICA DE BUSCA DE CEP (ViaCEP)
+            let cepTimer = null;
+
+            const fetchCepData = () => {
+                const cep = inputCep.value.replace(/\D/g, '');
+                
+                if (cep.length !== 8) {
+                    return;
+                }
+
+                inputCep.classList.add('loading-cep');
+
+                inputCidade.value = '';
+                inputEstado.value = '';
+                inputCidade.placeholder = 'Buscando...';
+                inputEstado.placeholder = 'Buscando...';
+                updateConcessionaria('');
+
+                fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.erro) {
+                            inputCidade.value = '';
+                            inputEstado.value = '';
+                            inputCidade.placeholder = 'CEP inválido, digite a cidade';
+                            inputEstado.placeholder = 'CEP inválido, digite o Estado';
+                            inputConcessionaria.value = '';
+                        } else {
+                            inputCidade.value = data.localidade || '';
+                            inputEstado.value = data.uf || '';
+                            inputCidade.placeholder = 'Preenchido automaticamente';
+                            inputEstado.placeholder = 'Preenchido automaticamente';
+                            updateConcessionaria(data.uf || '');
+                        }
+                        inputCep.classList.remove('loading-cep');
+                    })
+                    .catch(() => {
+                        inputCidade.value = '';
+                        inputEstado.value = '';
+                        inputCidade.placeholder = 'Erro na busca, digite a cidade';
+                        inputEstado.placeholder = 'Erro na busca, digite o Estado';
+                        inputCep.classList.remove('loading-cep');
+                    });
+            };
+
+
+            // -----------------------------------------------------------------------
+            // 5. LÓGICA DE VALIDAÇÃO E EVENT LISTENERS
+            // -----------------------------------------------------------------------
+
+            const checkFormValidity = () => {
+                let allFilled = requiredFields.every(field => field.value.trim() !== '');
+                
+                // Validação de e-mail básica
+                const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputEmail.value);
+                
+                // Validação de checkbox LGPD
+                const lgpdChecked = inputLgpd.checked;
+
+                const isReady = allFilled && emailValid && lgpdChecked;
+                btnSimular.disabled = !isReady;
+                return isReady;
+            };
+
+            // Nova função para gerenciar mudanças na Fatura (Cálculo em tempo real)
+            const handleFaturaChange = () => {
+                formatFaturaInput(); // Mantém a máscara
+                calculateAndDisplay(true); // Faz o cálculo do consumo, sem mostrar os resultados finais
+                checkFormValidity();
+            };
+
+            // INICIALIZAÇÃO
+            inputSimulacaoId.value = generateShortId();
+            
+            // Listeners para Máscaras e Cálculo de Consumo
+            inputFatura.addEventListener('input', handleFaturaChange); 
+            inputWhatsapp.addEventListener('input', formatWhatsappInput);
+            inputCep.addEventListener('input', formatCepInput);
+
+            // Listener para Busca de CEP com debounce
+            inputCep.addEventListener('keyup', () => {
+                clearTimeout(cepTimer);
+                cepTimer = setTimeout(fetchCepData, 500);
+            });
+            inputCep.addEventListener('blur', fetchCepData);
+
+            // Listeners para Validação (todos os campos obrigatórios)
+            [...requiredFields, inputLgpd].forEach(field => {
+                field.addEventListener('input', checkFormValidity);
+                field.addEventListener('change', checkFormValidity);
+            });
+
+
+            // Listener Principal de Simulação
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                if (!checkFormValidity()) {
+                    alert("Por favor, preencha todos os campos obrigatórios e aceite os termos do LGPD.");
+                    return;
+                }
+
+                // Chama a função para calcular e exibir os resultados (false = exibe)
+                if (calculateAndDisplay(false)) { 
+                    // Preenche campos de display com os resultados antes de mostrar
+                    form.style.display = 'none';
+                    resultadosContainer.style.display = 'block';
+
+                    // Foca a atenção nos resultados (opcional)
+                    resultadosContainer.scrollIntoView({ behavior: 'smooth' });
+
+                    // Envia os dados principais para o Google Forms Imediatamente (Envio 1)
+                    inputStatusContato.value = "Simulação Calculada - Aguardando Escolha de Prazo";
+                    sendDataToGoogleForms(0, "Não Selecionado", dadosSimulacao, inputStatusContato.value);
+                    inputStatusContato.value = "Aberto"; // Reverte para o padrão para o próximo envio
+
+                } else {
+                    alert("O valor da fatura é muito baixo. Não é possível fazer a simulação de economia.");
+                }
+            });
+
+            // Listener para Seleção de Parcelamento (Atualiza displays)
+            selectParcelamento.addEventListener('change', () => {
+                const selectedOption = selectParcelamento.options[selectParcelamento.selectedIndex];
+                const valorParcela = parseFloat(selectedOption.dataset.valor);
+                const prazo = selectedOption.dataset.prazo;
+                const prazoTexto = selectedOption.value; // ex: "120 meses"
+
+                if (valorParcela > 0) {
+                    parcelaEscolhidaDisplay.textContent = formatCurrency(valorParcela);
+                    prazoEscolhidoDisplay.textContent = `Em ${prazo} meses`;
+                    comparativoParcelaDisplay.textContent = formatCurrency(valorParcela);
+                    comparativoParcelaLabel.textContent = `PARCELA ESTIMADA (${prazo}x)`;
+
+                    // Envio 2: Envia os dados de financiamento para o Google Forms
+                    inputStatusContato.value = "Simulação Completa - Prazo Selecionado";
+                    sendDataToGoogleForms(valorParcela, prazoTexto, dadosSimulacao, inputStatusContato.value);
+                    inputStatusContato.value = "Aberto"; // Reverte para o padrão
+                } else {
+                    parcelaEscolhidaDisplay.textContent = 'Selecione o Prazo';
+                    prazoEscolhidoDisplay.textContent = '';
+                    comparativoParcelaDisplay.textContent = 'R$ 0,00';
+                    comparativoParcelaLabel.textContent = 'PARCELA ESTIMADA (Selecione)';
+                }
+            });
+            
+            // Listener para o botão Falar com um Especialista ⚡ LISTENER FINAL (ENVIO 3) ⚡
+            btnFalarEspecialista.addEventListener('click', () => {
+                // 1. Define o status final para o lead
+                const statusFinal = "Aguardando Contato do Especialista (Botão Final)";
+
+                // 2. Garante que os últimos dados da simulação (com parcelamento, se escolhido) sejam usados.
+                const selectedOption = selectParcelamento.options[selectParcelamento.selectedIndex] || {};
+                const valorParcela = parseFloat(selectedOption.dataset.valor) || 0;
+                const prazoTexto = selectedOption.value || "Não Selecionado";
+
+                // 3. Envia os dados
+                sendDataToGoogleForms(valorParcela, prazoTexto, dadosSimulacao, statusFinal);
+
+                // 4. Feedback para o usuário
+                alert('Parabéns! Sua jornada rumo à energia solar começou! Você receberá um contato de um especialista com mais detalhes da simulação de seu projeto.');
+            });
+            
+            // Listener do botão Refazer Simulação
+            btnRefazer.addEventListener('click', () => {
+                form.reset();
+                inputSimulacaoId.value = generateShortId(); // Gera novo ID para nova tentativa
+                resultadosContainer.style.display = 'none';
+                form.style.display = 'block';
+                btnSimular.disabled = true;
+                // Limpa campos automáticos
+                inputConsumo.value = '';
+                inputCidade.value = '';
+                inputEstado.value = '';
+                inputConcessionaria.value = '';
+                // Volta o scroll (opcional)
+                document.querySelector('.container').scrollIntoView({ behavior: 'smooth' });
+            });
+
+
+            // -----------------------------------------------------------------------
+            // 6. LÓGICA DE SUBMISSÃO PARA GOOGLE FORMS (AJAX/FETCH)
+            // -----------------------------------------------------------------------
+            const sendDataToGoogleForms = (parcelaValor, prazoMesesTexto, results, statusContato) => {
+                // Prepara os valores de financiamento para o Forms
+                const parcelaDisplay = parcelaValor > 0 ? formatCurrency(parcelaValor) : "Não Selecionado";
+                const prazoDisplay = prazoMesesTexto !== "Não Selecionado" 
+                    ? `${prazoMesesTexto} (${parcelaDisplay})`
+                    : "Não Selecionado";
+
+                // 1. Coleta dos dados
+                const data = {
+                    // DADOS PESSOAIS
+                    [FORM_FIELD_MAP.NomeCompleto]: inputNome.value,
+                    [FORM_FIELD_MAP.Email]: inputEmail.value,
+                    [FORM_FIELD_MAP.WhatsApp]: inputWhatsapp.value.replace(/\D/g, ''),
+                    [FORM_FIELD_MAP.CEP]: inputCep.value,
+                    [FORM_FIELD_MAP.Cidade]: inputCidade.value,
+                    [FORM_FIELD_MAP.Estado]: inputEstado.value,
+                    // DADOS DE CONSUMO
+                    [FORM_FIELD_MAP.ValorFatura]: getNumericValue(inputFatura),
+                    [FORM_FIELD_MAP.ConsumoKWh]: getNumericValue(inputConsumo),
+                    [FORM_FIELD_MAP.PadraoEletrico]: inputPadrao.value,
+                    [FORM_FIELD_MAP.TipoImovel]: inputImovel.value,
+                    [FORM_FIELD_MAP.Concessionaria]: inputConcessionaria.value,
+                    // DADOS DA SIMULAÇÃO
+                    [FORM_FIELD_MAP.PotenciaEstimada]: formatNumber(results.potenciaKwp, 2) + ' kWp',
+                    [FORM_FIELD_MAP.PlacasQtd]: results.placasQtd,
+                    [FORM_FIELD_MAP.GeracaoMensal]: formatNumber(results.geracaoMensal, 0) + ' kWh',
+                    [FORM_FIELD_MAP.EconomiaMensal]: formatCurrency(results.economiaMensal),
+                    [FORM_FIELD_MAP.InvestimentoFaixa]: results.investimentoFaixa,
+                    // DADOS DE FINANCIAMENTO (Podem ser "Não Selecionado" no primeiro envio)
+                    [FORM_FIELD_MAP.ParcelaEscolhida]: parcelaDisplay,
+                    [FORM_FIELD_MAP.PrazoParcelamento]: prazoDisplay,
+                    // DADOS DE CONTROLE
+                    [FORM_FIELD_MAP.SimulacaoID]: inputSimulacaoId.value,
+                    [FORM_FIELD_MAP.StatusContato]: statusContato 
+                };
+
+                // 2. Converte o objeto de dados para o formato URL (URLSearchParams)
+                const formData = new URLSearchParams();
+                for (const key in data) {
+                    formData.append(key, data[key]);
+                }
+                
+                // 3. Envio dos dados via Fetch (evita redirecionamento da página)
+                fetch(CONFIG.GOOGLE_FORM_ACTION_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', 
+                    body: formData
+                })
+                .then(() => {
+                    console.log(`Dados enviados com sucesso para o Google Forms! Status: ${statusContato}`);
+                })
+                .catch(error => {
+                    console.error('Erro ao enviar dados para o Google Forms:', error);
+                });
+            };
+
+        });
+    </script>
+</body>
+</html>
