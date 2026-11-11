@@ -341,6 +341,22 @@
         .acoes-rodape .btn-simular + .btn-refazer {
             margin-top: 15px;
         }
+        @media print {
+            body {
+                background-color: #ffffff;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                border: none;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+            .acoes-rodape, .btn-simular {
+                display: none !important;
+            }
+        }
 
     </style>
 </head>
