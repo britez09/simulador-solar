@@ -357,6 +357,32 @@
                 display: none !important;
             }
         }
+        /* BOTÃO REDONDO FLUTUANTE SÓ COM ÍCONE WHATSAPP */
+        .whatsapp-flutuante {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background-color: #25d366;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 9999;
+            transition: transform 0.3s ease;
+            text-decoration: none;
+        }
+        .whatsapp-flutuante:hover {
+            transform: scale(1.1);
+            background-color: #20ba5a;
+        }
+        @media print {
+            .whatsapp-flutuante {
+                display: none !important;
+            }
+        }
 
     </style>
 </head>
@@ -1056,5 +1082,15 @@
 
         });
     </script>
+        <!-- BOTÃO REDONDO FLUTUANTE WHATSAPP -->
+          <a href="https://wa.me/5566984033567"
+       class="whatsapp-flutuante" 
+       target="_blank" 
+       aria-label="Fale conosco no WhatsApp">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="#ffffff" xmlns="http://w3.org">
+            <path d="M12.031 2C6.508 2 2.023 6.485 2.023 12.008c0 1.766.461 3.489 1.337 5.008L2 22l5.125-1.344c1.465.801 3.118 1.223 4.906 1.223h.004c5.522 0 10.007-4.485 10.007-10.008 0-2.674-1.041-5.188-2.931-7.078A9.939 9.939 0 0 0 12.031 2zm5.822 14.316c-.246.692-1.433 1.324-1.988 1.408-.51.077-1.155.109-1.864-.116-.43-.137-.981-.319-1.688-.624-2.971-1.283-4.911-4.274-5.059-4.471-.148-.198-1.208-1.607-1.208-3.065 0-1.458.765-2.175 1.036-2.471.271-.296.592-.37.789-.37.198 0 .395.002.568.01.182.009.426-.069.666.509.247.593.839 2.049.913 2.197.074.148.123.321.025.519-.099.198-.148.321-.296.494-.148.173-.312.386-.445.519-.148.148-.303.309-.13.605.173.296.768 1.267 1.649 2.052 1.133 1.01 2.088 1.323 2.384 1.471.296.148.469.123.642-.074.173-.198.741-.864.938-1.16.198-.296.395-.247.667-.148.271.099 1.728.815 2.024.963.296.148.494.222.568.346.074.123.074.716-.172 1.408z"/>
+        </svg>
+    </a>
+
 </body>
 </html>
