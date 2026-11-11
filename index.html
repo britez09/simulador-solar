@@ -383,13 +383,87 @@
                 display: none !important;
             }
         }
+        /* MENU EXPANSÍVEL SOBRE NÓS */
+        .sobre-nos-wrapper {
+            position: relative;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .btn-sobre-nos {
+            background-color: transparent;
+            color: #003366;
+            border: 1px solid #d0d7de;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-sobre-nos:hover {
+            background-color: #f0f4f8;
+            border-color: #003366;
+        }
+        .caixa-sobre-nos {
+            display: none;
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 18px;
+            margin-top: 10px;
+            text-align: left;
+            font-size: 14px;
+            color: #444;
+            line-height: 1.6;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        .caixa-sobre-nos.ativo {
+            display: block;
+            animation: fadeIn 0.25s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media print {
+            .sobre-nos-wrapper {
+                display: none !important;
+            }
+        }
 
     </style>
 </head>
 <body>
     <div class="container"> <div style="text-align: center; margin-bottom: 15px;">
             <img src="Logo.png" alt="Logo Britez Solar" style="max-width: 200px; height: auto;">
+        </div>        <!-- BOTÃO E TEXTO EXPANSÍVEL SOBRE NÓS -->
+        <div class="sobre-nos-wrapper" id="area-sobre-nos">
+            <button type="button" class="btn-sobre-nos" onclick="alternarSobreNos(event)">
+                Sobre Nós ▾
+            </button>
+            <div class="caixa-sobre-nos" id="conteudo-sobre-nos">
+             <p style="margin-top: 0; font-weight: bold; color: #003366; font-size: 15px;">
+    Especialistas em Serviços de Eletricista, Engenharia e Consultoria Técnica Solar
+</p>
+<p style="margin-bottom: 10px;">
+    A <strong>BRITEZ SOLAR</strong> (antiga Eletrônica TVTEC) cuida de tudo para você: projeto, instalação e homologação junto à concessionária. Cada sistema é dimensionado sob medida para o seu consumo, utilizando as melhores marcas do mercado para garantir qualidade, eficiência e segurança na sua usina solar.
+</p>
+<p style="margin-bottom: 6px; font-weight: bold; color: #003366;">
+    Nossa Trajetória
+</p>
+<p style="margin-bottom: 10px;">
+    Em processo de transição de marca, a <strong>BRITEZ SOLAR</strong> iniciou suas atividades em janeiro de 2010 na cidade de Nova Bandeirantes - MT, dedicando-se inicialmente aos reparos e instalações de equipamentos eletrônicos com excelência e comprometimento.
+</p>
+<p style="margin-bottom: 10px;">
+    Em 2019, ampliamos nossa atuação para o desenvolvimento e instalação de sistemas de geração de energia solar fotovoltaica, atendendo à crescente demanda por soluções econômicas e sustentáveis.
+</p>
+<p style="margin-bottom: 0;">
+    Hoje, com sede em Alta Floresta - MT, seguimos evoluindo e acompanhando as tendências do mercado para oferecer o melhor atendimento e as melhores soluções em energia limpa para Alta Floresta, Nova Bandeirantes e toda a região.
+</p>
+
+            </div>
         </div>
+
         <h2> Simule seu sistema solar ⚡ GRÁTIS ⚡</h2>
         <p class="subtext">
             Preencha os dados abaixo, descubra quanto você está deixando de ganhar, por não ter Energia Solar!<br>
@@ -1081,6 +1155,23 @@
             };
 
         });
+                // FUNÇÃO PARA EXPANDIR E RECOLHER O "SOBRE NÓS" AO CLICAR FORA
+        function alternarSobreNos(event) {
+            event.stopPropagation();
+            const caixa = document.getElementById('conteudo-sobre-nos');
+            caixa.classList.toggle('ativo');
+        }
+
+        document.addEventListener('click', function(event) {
+            const area = document.getElementById('area-sobre-nos');
+            const caixa = document.getElementById('conteudo-sobre-nos');
+            if (area && caixa && caixa.classList.contains('ativo')) {
+                if (!area.contains(event.target)) {
+                    caixa.classList.remove('ativo');
+                }
+            }
+        });
+
     </script>
         <!-- BOTÃO REDONDO FLUTUANTE WHATSAPP -->
           <a href="https://wa.me/5566984033567"
